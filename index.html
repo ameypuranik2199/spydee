@@ -2,63 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spydarr Web Tech | Cinematic Intro</title>
+    <title>Spydarr Webtech | The Weave</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body { margin: 0; background: #0d0d0d; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Arial Black', sans-serif; }
+        body { margin: 0; background: #0a0a0a; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #canvas-container { position: relative; width: 1000px; height: 400px; }
+        canvas { position: absolute; top: 0; left: 0; }
         
-        #stage { width: 800px; height: 400px; position: relative; }
-        
-        /* The Silk Thread */
-        #thread { position: absolute; top: -500px; left: 50%; width: 2px; height: 600px; background: rgba(255,255,255,0.3); transform-origin: top center; }
-        
-        /* The Spider Body */
-        #spider { position: absolute; bottom: -20px; left: -14px; width: 30px; height: 20px; background: #221F1F; border-radius: 50%; border: 1px solid #8B1E1E; }
-        
-        /* The Text */
-        #brand-name { color: #8B1E1E; font-size: 3.5rem; letter-spacing: 5px; opacity: 0; filter: drop-shadow(0 0 10px #8B1E1E); text-transform: uppercase; }
-        
-        .web-line { position: absolute; background: #8B1E1E; opacity: 0.5; }
+        /* The final glowing text */
+        #final-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8B1E1E;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 5rem;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px #ff0000;
+            opacity: 0;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
 
-<div id="stage">
-    <div id="thread">
-        <div id="spider"></div>
-    </div>
-    <h1 id="brand-name">Spydarr Webtech</h1>
+<div id="canvas-container">
+    <div id="final-text">SPYDARR WEBTECH</div>
+    <canvas id="webCanvas"></canvas>
 </div>
 
 <script>
-    const tl = gsap.timeline();
+    const canvas = document.getElementById('webCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvas-container');
+    
+    canvas.width = 1000;
+    canvas.height = 400;
 
-    // 1. The Spider drops down from the top
-    tl.to("#thread", { top: 0, duration: 2, ease: "bounce.out" });
+    let spider = { x: 500, y: -50, r: 15 };
+    let points = []; // Stores the "silk" path
+    
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw the silk thread from the top
+        ctx.beginPath();
+        ctx.moveTo(500, 0);
+        ctx.lineTo(spider.x, spider.y);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.stroke();
 
-    // 2. The Spider "swings" and the text weaves in
-    tl.to("#thread", { 
-        rotation: 15, 
-        duration: 0.5, 
-        repeat: 5, 
-        yoyo: true, 
-        ease: "sine.inOut" 
+        // Draw the woven web lines
+        ctx.beginPath();
+        ctx.strokeStyle = "#8B1E1E";
+        ctx.lineWidth = 2;
+        points.forEach((p, i) => {
+            if (i === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+        });
+        ctx.stroke();
+
+        // Draw the Spider
+        ctx.fillStyle = "#1a1a1a";
+        ctx.strokeStyle = "#8B1E1E";
+        ctx.beginPath();
+        ctx.ellipse(spider.x, spider.y, 15, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    const tl = gsap.timeline({ onUpdate: draw });
+
+    // 1. Spider Drops Down
+    tl.to(spider, { y: 200, duration: 1.5, ease: "bounce.out" });
+
+    // 2. The Weaving Action (Zig-Zagging across the text area)
+    const weavePath = [
+        {x: 100, y: 150}, {x: 150, y: 250}, {x: 200, y: 150}, {x: 250, y: 250},
+        {x: 300, y: 150}, {x: 400, y: 250}, {x: 550, y: 150}, {x: 700, y: 250},
+        {x: 850, y: 150}, {x: 900, y: 200}
+    ];
+
+    weavePath.forEach((pt) => {
+        tl.to(spider, { 
+            x: pt.x, 
+            y: pt.y, 
+            duration: 0.4, 
+            ease: "power1.inOut",
+            onUpdate: () => points.push({x: spider.x, y: spider.y})
+        });
     });
 
-    // 3. Characters appear one by one as if woven
-    tl.to("#brand-name", {
-        opacity: 1,
-        duration: 2,
-        onStart: () => {
-            // Add a "glow" pulse effect
-            gsap.to("#brand-name", { textShadow: "0 0 20px #ff0000", repeat: -1, yoyo: true });
-        }
-    }, "-=2");
+    // 3. Reveal the Glow Text and Hide the raw lines
+    tl.to("#final-text", { opacity: 1, duration: 1.5, scale: 1.1 });
+    tl.to(canvas, { opacity: 0, duration: 1 }, "-=1");
 
-    // 4. The Spider settles into position
-    tl.to("#thread", { rotation: 0, duration: 1 });
-    tl.to("#spider", { scale: 1.2, duration: 0.5, yoyo: true, repeat: 1 });
+    // 4. Spider moves to logo position
+    tl.to(spider, { x: 500, y: 300, duration: 1 });
+
 </script>
-
 </body>
 </html>
