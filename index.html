@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spydarr Web Tech | Who Knows It Better?</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        #viewport {
+            width: 90vw;
+            max-width: 800px;
+        }
+        .web-text {
+            fill: none;
+            stroke: #8B1E1E;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        #spider {
+            fill: #221F1F;
+        }
+        .hidden {
+            display: none;
+        }
+        #final-logo {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="viewport">
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Text Outline (Simplistic Path for Weaving) -->
+        <path id="weave-path" class="web-text" d="M50,150 L50,50 L100,50 L100,100 L50,100 M120,150 L120,50 L170,50 L170,100 L120,100 M190,150 L190,50 L240,50 L240,150" style="stroke-dasharray: 1000; stroke-dashoffset: 1000;"/>
+        
+        <!-- The Animated Spider -->
+        <path id="spider" d="M0,0 Q2,-5 4,0 Q2,5 0,0" transform="translate(-10,-10)" />
+
+        <!-- Final Text Placeholder -->
+        <text id="main-text" x="50" y="120" font-family="Arial Black" font-size="40" fill="#8B1E1E" style="opacity:0;">SPYDARR</text>
+    </svg>
+</div>
+
+<script>
+    gsap.registerPlugin(MotionPathPlugin);
+
+    const tl = gsap.timeline();
+
+    // 1. Draw the initial 'web' letters
+    tl.to("#weave-path", {
+        strokeDashoffset: 0,
+        duration: 5,
+        ease: "none"
+    });
+
+    // 2. Spider following the path
+    tl.to("#spider", {
+        duration: 5,
+        ease: "none",
+        motionPath: {
+            path: "#weave-path",
+            align: "#weave-path",
+            alignOrigin: [0.5, 0.5]
+        }
+    }, 0);
+
+    // 3. Fade in actual branding and fade out the lines
+    tl.to("#main-text", { opacity: 1, duration: 1 }, "-=0.5");
+    tl.to("#weave-path", { opacity: 0, duration: 1 }, "<");
+    tl.to("#spider", { scale: 0, opacity: 0, duration: 0.5 });
+
+</script>
+</body>
+</html>
