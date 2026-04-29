@@ -2,87 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spydarr Web Tech | Who Knows It Better?</title>
+    <title>Spydarr Web Tech | Cinematic Intro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-        #viewport {
-            width: 90vw;
-            max-width: 800px;
-        }
-        .web-text {
-            fill: none;
-            stroke: #8B1E1E;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        #spider {
-            fill: #221F1F;
-        }
-        .hidden {
-            display: none;
-        }
-        #final-logo {
-            opacity: 0;
-        }
+        body { margin: 0; background: #0d0d0d; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Arial Black', sans-serif; }
+        
+        #stage { width: 800px; height: 400px; position: relative; }
+        
+        /* The Silk Thread */
+        #thread { position: absolute; top: -500px; left: 50%; width: 2px; height: 600px; background: rgba(255,255,255,0.3); transform-origin: top center; }
+        
+        /* The Spider Body */
+        #spider { position: absolute; bottom: -20px; left: -14px; width: 30px; height: 20px; background: #221F1F; border-radius: 50%; border: 1px solid #8B1E1E; }
+        
+        /* The Text */
+        #brand-name { color: #8B1E1E; font-size: 3.5rem; letter-spacing: 5px; opacity: 0; filter: drop-shadow(0 0 10px #8B1E1E); text-transform: uppercase; }
+        
+        .web-line { position: absolute; background: #8B1E1E; opacity: 0.5; }
     </style>
 </head>
 <body>
 
-<div id="viewport">
-    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- Text Outline (Simplistic Path for Weaving) -->
-        <path id="weave-path" class="web-text" d="M50,150 L50,50 L100,50 L100,100 L50,100 M120,150 L120,50 L170,50 L170,100 L120,100 M190,150 L190,50 L240,50 L240,150" style="stroke-dasharray: 1000; stroke-dashoffset: 1000;"/>
-        
-        <!-- The Animated Spider -->
-        <path id="spider" d="M0,0 Q2,-5 4,0 Q2,5 0,0" transform="translate(-10,-10)" />
-
-        <!-- Final Text Placeholder -->
-        <text id="main-text" x="50" y="120" font-family="Arial Black" font-size="40" fill="#8B1E1E" style="opacity:0;">SPYDARR</text>
-    </svg>
+<div id="stage">
+    <div id="thread">
+        <div id="spider"></div>
+    </div>
+    <h1 id="brand-name">Spydarr Webtech</h1>
 </div>
 
 <script>
-    gsap.registerPlugin(MotionPathPlugin);
-
     const tl = gsap.timeline();
 
-    // 1. Draw the initial 'web' letters
-    tl.to("#weave-path", {
-        strokeDashoffset: 0,
-        duration: 5,
-        ease: "none"
+    // 1. The Spider drops down from the top
+    tl.to("#thread", { top: 0, duration: 2, ease: "bounce.out" });
+
+    // 2. The Spider "swings" and the text weaves in
+    tl.to("#thread", { 
+        rotation: 15, 
+        duration: 0.5, 
+        repeat: 5, 
+        yoyo: true, 
+        ease: "sine.inOut" 
     });
 
-    // 2. Spider following the path
-    tl.to("#spider", {
-        duration: 5,
-        ease: "none",
-        motionPath: {
-            path: "#weave-path",
-            align: "#weave-path",
-            alignOrigin: [0.5, 0.5]
+    // 3. Characters appear one by one as if woven
+    tl.to("#brand-name", {
+        opacity: 1,
+        duration: 2,
+        onStart: () => {
+            // Add a "glow" pulse effect
+            gsap.to("#brand-name", { textShadow: "0 0 20px #ff0000", repeat: -1, yoyo: true });
         }
-    }, 0);
+    }, "-=2");
 
-    // 3. Fade in actual branding and fade out the lines
-    tl.to("#main-text", { opacity: 1, duration: 1 }, "-=0.5");
-    tl.to("#weave-path", { opacity: 0, duration: 1 }, "<");
-    tl.to("#spider", { scale: 0, opacity: 0, duration: 0.5 });
-
+    // 4. The Spider settles into position
+    tl.to("#thread", { rotation: 0, duration: 1 });
+    tl.to("#spider", { scale: 1.2, duration: 0.5, yoyo: true, repeat: 1 });
 </script>
+
 </body>
 </html>
